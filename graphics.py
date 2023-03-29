@@ -27,3 +27,23 @@ def plot_raw(t, x, y):
     plt.show()
 
 
+def polt_still(x, y):
+    x_values = y.copy
+    y_values = x.copy()
+
+    # Create a figure and axis
+    fig, ax = plt.subplots()
+
+    # Plot the data as a line
+    ax.plot(x_values, y_values)
+
+    # Set the chart title and axis labels
+    ax.set_title('My Line Plot')
+    ax.set_xlabel('X-axis Label')
+    ax.set_ylabel('Y-axis Label')
+
+    # Show the chart
+    plt.show()
+
+
+
