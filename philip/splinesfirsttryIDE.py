@@ -28,7 +28,7 @@ def cubic_spline(xraw, yraw):
     b = np.zeros(n - 1)
     d = np.zeros(n - 1)
 
-    xcs = np.linspace(xraw[0], xraw[-1], 100)  # create 100 points on x to calculate cubic spline y values
+    xcs = np.linspace(xraw[0], xraw[-1], 110)  # create points on x to calculate cubic spline y values
     for j in range(n - 2, -1, -1):
         c[j] = z[j] - mu[j] * c[j + 1]
         b[j] = (yraw[j + 1] - yraw[j]) / h[j] - h[j] * (c[j + 1] + 2 * c[j]) / 3
@@ -74,8 +74,10 @@ ax.set_xlim([min(x) - 50, max(x) + 50])
 ax.set_ylim([min(y) - 50, max(y) + 50])
 
 # Plotten der Punkte
-points, = ax.plot([], [], 'b-', label='Spline')
+points, = ax.plot([], [], 'go', label='Spline')
+pointsSteady, = ax.plot([], [], 'yx', label='Spline')
 ax.plot(x, y, 'ro', label='Rohdaten')
+ax.plot(x_new, y_new, 'b-', label='Spline')
 
 
 # Update-Funktion für die Animation
@@ -86,9 +88,18 @@ def update(i):
     # Rückgabe des geänderten Punkte-Objekts
     return points,
 
+# Update-Funktion für die Animation mit stetiger geschwindigkeit
+def updateSteady(i):
+    # Setzen der neuen Daten für die Punkte
+    pointsSteady.set_data(x_new[:i + 1], y_new[:i + 1])
+
+    # Rückgabe des geänderten Punkte-Objekts
+    return pointsSteady,
+
 
 # Erstellung der Animation
-animation = FuncAnimation(fig2, update, frames=len(t_new), interval=25, repeat=False)
+animation = FuncAnimation(fig2, update, frames=len(t_new), interval=10, repeat=False)
+animationSteady = FuncAnimation(fig2, updateSteady, frames=len(t_new), interval=10, repeat=False)
 
 # Anzeigen der Animation
 plt.show()
