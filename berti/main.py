@@ -34,6 +34,9 @@ for i in range(len(step)):
 
 phi = Fun.solveEulerex(step,dat.v_const,ax,bx,cx,dx,ay,by,cy,dy,t)
 animation.plot_Phi(phi,step[:-1])
+for i in range(len(phi)):
+    sx[i] = spline(phi[i], ax, bx, cx, dx, N, t)
+    sy[i] = spline(phi[i], ay, by, cy, dy, N, t)
 
 #Animiation der Punkte und Spline
 Animate(x,y,sx,sy,step)

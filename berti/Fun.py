@@ -36,7 +36,7 @@ def coeff(x, y):
     # f''(x_{i + 1}) = (f(x_i) - 2f(x_{i+1}) + f(x_{i + 2})) / h_{i + 1} ^ 2
     for i in range(N - 1):
         f[i] = 6 * (y[i + 2] - y[i + 1]) / h[i + 1] - 6 * (y[i + 1] - y[i]) / h[i]
-    # Einschub test eigener Solver
+    # Einschub test eigener Solver aus der matrix die gesuchten koeffizienten herauslesen
 
     a[0] = 0
     c[N - 1] = 0
@@ -47,7 +47,7 @@ def coeff(x, y):
         b[i] = A[i, i]
     b[0] = A[0, 0]
 
-    ydd = TDMA_solver(a[:14], b[:14], c[1:15], f)
+    ydd = TDMA_solver(a[:14], b[:14], c[1:15], f) # Tridiagnonale Matrix lösen
     ydd2 = np.zeros(N + 1)
     ydd2[0] = 0  # Start Randbedingung
     ydd2[N] = 0  # end Randbedingung
@@ -70,19 +70,18 @@ def PathInt(sx, sy):
         l += np.sqrt(np.power(sx[n + 1] - sx[n], 2) + np.power(sy[n + 1] - sy[n], 2))
     return l
 
-
-def s(b, c, d, step_s, t):
-    b, c, d, step_s, t = map(np.array, (b, c, d, step_s, t))  # copy the array
-    x = b + c * (2 * step_s - 2 * t) + d * (
-                6 * t * step_s + 3 * t + 3 * step_s ** 2)  # Todo: geting very big values here ->
+# ableitung des weges in einer Dimension
+def s(b,c,d,step_s,t):
+    b,c,d,step_s,t = map(np.array, (b,c,d,step_s,t))  # copy the array
+    x = b+2*c*(step_s-t)+d*3*(step_s-t)**3 # ableitung
     return x
 
-
+# Gesuchte funktion /aktuell nicht in verwendung
 def singelPhi(m, step_s):
     return m * step_s
 
-
-def f(step_s, bx_s, cx_s, dx_s, by_s, cy_s, dy_s, t_s, phi):
+# Ableitung (Betrag eines 2D vektors) des weges an einem gegebenen Punkt -> geschwindigkeit
+def f(step_s, bx_s, cx_s, dx_s, by_s, cy_s, dy_s, t_s):
     x = (s(bx_s, cx_s, dx_s, step_s, t_s)) ** 2
     y = (s(by_s, cy_s, dy_s, step_s, t_s)) ** 2
     g = dat.v_const / np.sqrt(x + y)
@@ -93,16 +92,16 @@ def f(step_s, bx_s, cx_s, dx_s, by_s, cy_s, dy_s, t_s, phi):
 # Phi(t) hat 15 Abschnitte folglich ein gleichungssystem mit 15 gleichungen
 # Phi'(t) = vc/abs(Phi(t)
 def solveEulerex(step, vc, ax, bx, cx, dx, ay, by, cy, dy, t):
-    dh = 0.05
+    dh = 0.05 # Schrittgrösse aktuell
     h = np.arange(t[0] + dh, t[-1] + dh, dh)
     Phi_m = np.zeros(len(h))
-    Phi_m[0] = dat.y0
+    Phi_m[0] = dat.y0 # Startwert für eulerverfahren
 
     for i in range(1, len(h) - 1):
-        j = int((h[i] - np.mod(h[i], 2)) / 2)
+        j = int((h[i] - np.mod(h[i], 2)) / 2) # itteration durch die Koeffizienten
         Phi_m_prev = Phi_m[i - 1]
         t_curr = h[i]
-        fcurent = f(Phi_m_prev, bx[j], cx[j], dx[j], by[j], cy[j], dy[j], t_curr, 0)
-        Phi_m[i] = Phi_m_prev + dh * fcurent
+        fcurent = f(Phi_m_prev, bx[j], cx[j], dx[j], by[j], cy[j], dy[j], t_curr)
+        Phi_m[i] = Phi_m_prev + dh * fcurent  # Vorwärtsschritt
 
     return Phi_m
