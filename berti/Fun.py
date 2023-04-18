@@ -75,7 +75,7 @@ def PathInt(sx, sy):
 # ableitung des weges in einer Dimension
 def s(b,c,d,step_s,t):
     b,c,d,step_s,t = map(np.array, (b,c,d,step_s,t))  # copy the array
-    x = b+2*c*(step_s-t)+d*3*(step_s-t)**3 # ableitung
+    x = b+2*c*(step_s-t)+d*3*(step_s-t)**2 # ableitung
     return x
 
 
@@ -120,8 +120,6 @@ def f_num(ax, bx_s, cx_s, dx_s, ay, by_s, cy_s, dy_s, y_alt, t_s,h):
 # Phi'(t) = vc/abs(Phi(t)
 
 
-
-# TODO: implementation ist nicht so falsch jedoch wird die ableitung an den stellen, bei denen die Parameter geändert werden hoch und daher fehlerhat, ein lösungsansatz ist, das euleverfahren stükweise zu machendamit innerhalb des eulerverfahrens keine "sprungstellen" entstehen
 def explizitEuler(ax, bx, cx, dx, ay, by, cy, dy,t, xend, h, y0, f):
     """
     :param bx:  bx koeffizient von Spline (Array)
@@ -142,13 +140,12 @@ def explizitEuler(ax, bx, cx, dx, ay, by, cy, dy,t, xend, h, y0, f):
     xalt = 0
     yalt = y0
 
-    while x[-1] < xend-h/2:
-        j = int((yalt - np.mod(yalt-h , 2)) / 2) # itteration durch koeffizienten
+    while y[-1] < xend:
+        j = int((yalt - np.mod(yalt-h/2 , 2)) / 2) # itteration durch koeffizienten
         # explizites Eulerverfahren
-        if j == 15:
-            j =14
-        yneu = yalt + h*f( bx[j], cx[j], dx[j], by[j], cy[j], dy[j],yalt, t[j]) # Symbolisch
 
+        yneu = yalt + h*f( bx[j], cx[j], dx[j], by[j], cy[j], dy[j],yalt, t[j]) # Symbolisch
+        #yneu = yalt + h * f_num(ax[j], bx[j], cx[j], dx[j], ay[j], by[j], cy[j], dy[j], yalt, t[j], h) #Nuerisch
         xneu = xalt + h
 
         # Speichern des Resultats
