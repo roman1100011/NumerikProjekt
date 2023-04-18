@@ -25,12 +25,13 @@ def Animate(x,y,sx,sy,step):
 
     # Anzeigen der Animation
     plt.show()
-def plot_Phi(phi):
+def plot_Phi(phi,step):
     x = np.linspace(0,len(phi),600)/30
     fig1 , ax1 = plt.subplots()
     ax1.set_xlim([min(x) - 5, max(x) + 5])
     ax1.set_ylim([min(phi) - 10, max(phi) + 10])
     ax1.plot(x, phi, 'ro', label='Phi')
+    ax1.plot(x,step)
     plt.grid = True
     plt.show()
 

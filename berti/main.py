@@ -33,7 +33,7 @@ for i in range(len(step)):
 
 
 phi = Fun.solveEulerex(step,dat.v_const,ax,bx,cx,dx,ay,by,cy,dy,t)
-animation.plot_Phi(phi)
+animation.plot_Phi(phi,step[:-1])
 
 #Animiation der Punkte und Spline
 Animate(x,y,sx,sy,step)
