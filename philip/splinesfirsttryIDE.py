@@ -44,16 +44,18 @@ def cubic_spline(xraw, yraw):
     return xcs, ycs
 
 
-# Input der Rohdaten
-t = np.array([0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22])
-x = np.array([0, 400, 500, 500, 400, 50, 50, 200, 300, 460, 440, 150])
-y = np.array([0, 0, 100, 400, 500, 500, 575, 700, 700, 575, 400, 65])
+# Import der Rohdaten
+def import_data(Path):
+    imported_data = np.loadtxt(Path,skiprows=1)
+    t, x, y= imported_data[:,0],imported_data[:,1],imported_data[:,2]
+    return x, y, t
+x, y, t = import_data("/Users/philipkehl/Library/CloudStorage/OneDrive-ZHAW/Semester 4/Numerik/NumerikProjekt/coordinates.txt")
 
 # Splineinterpolation mit der erstellten Funktion berechnen
 t_new, x_new = cubic_spline(t, x)
 t_new, y_new = cubic_spline(t, y)
 
-"""
+
 # Rohdaten und Interpolation graphisch darstellen
 fig, ax = plt.subplots()
 ax.set_xlim([t[0] - 1, t[len(t) - 1] + 1])
@@ -65,7 +67,7 @@ ax.plot(t_new, x_new, label='x-Spline-Interpolation')
 ax.plot(t_new, y_new, label='y-Spline-Interpolation')
 ax.legend()
 plt.show()
-"""
+
 
 
 # Zeitliche Animation der Rohdaten und der Interpolation

@@ -11,7 +11,7 @@ import Variables as dat
 
 
 #Daten Importieren  -> Achtung lokaler Path
-x, y, t = import_data("/Users/romanberti/PycharmProjects/scientificProject/coordinates.txt")
+x, y, t = import_data("/Users/philipkehl/Library/CloudStorage/OneDrive-ZHAW/Semester 4/Numerik/NumerikProjekt/coordinates.txt")
 
 #Calculate coeffitients
 ax, bx, cx, dx, N = coeff(t, x)
@@ -26,13 +26,15 @@ sy = np.zeros(len(step))
 
 
 
-#Spline ausrechnen aus koefizienten -> ploten
+#Spline ausrechnen aus koeffizienten -> plotten
 for i in range(len(step)):
     sx[i] = spline(step[i], ax, bx, cx, dx, N, t)
     sy[i] = spline(step[i], ay, by, cy, dy, N, t)
 
-
 phi = Fun.solveEulerex(step,dat.v_const,ax,bx,cx,dx,ay,by,cy,dy,t)
+# for i in range(len(phi)):
+#     sx[i] = spline(phi[i], ax, bx, cx, dx, N, t)
+#     sy[i] = spline(phi[i], ay, by, cy, dy, N, t)
 animation.plot_Phi(phi,step[:-1])
 
 #Animiation der Punkte und Spline
