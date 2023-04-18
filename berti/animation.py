@@ -11,7 +11,7 @@ def Animate(x,y,sx,sy,step):
     # Plotten der Punkte
     points, = ax.plot([], [], 'g-', label='Spline')
     ax.plot(x, y, 'ro', label='Rohdaten')
-    # Update-Funktion für die Animation
+    # Update-Funktion füra die Animation
     def update(i):
         # Setzen der neuen Daten für die Punkte
         points.set_data(sx[:i + 1], sy[:i + 1])
@@ -36,11 +36,11 @@ def plot_Phi(phi,step):
 
 
 def plot_Phi2(phi,step):
-    x = np.linspace(0,len(phi),589)/30
+    x = np.linspace(0,len(phi),567)/30
     fig1 , ax1 = plt.subplots()
     ax1.set_xlim([min(x) - 5, max(x) + 5])
     ax1.set_ylim([min(phi) - 10, max(phi) + 10])
     ax1.plot(x, phi, 'ro', label='Phi')
-    ax1.plot(x,step[:-1])
+    #ax1.plot(x,step[:-23])
     plt.grid = True
     plt.show()

@@ -142,12 +142,16 @@ def explizitEuler(ax, bx, cx, dx, ay, by, cy, dy,t, xend, h, y0, f):
     xalt = 0
     yalt = y0
 
-    while x[-1] < xend-h/2:
-        j = int((yalt - np.mod(yalt-h , 2)) / 2) # itteration durch koeffizienten
+    while y[-1] < xend-h/2:
+        j = int((yalt - np.mod(yalt , 2)) / 2) # itteration durch koeffizienten
         # explizites Eulerverfahren
         if j == 15:
             j =14
         yneu = yalt + h*f( bx[j], cx[j], dx[j], by[j], cy[j], dy[j],yalt, t[j]) # Symbolisch
+        if int((yneu - np.mod(yneu-h , 2)) / 2) > j:
+            if j == 15:
+                j = 13
+            yneu = yalt + h * f(bx[j+1], cx[j+1], dx[j+1], by[j+1], cy[j+1], dy[j+1], yalt, t[j+1])  # Symbolisch
 
         xneu = xalt + h
 

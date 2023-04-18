@@ -38,7 +38,7 @@ for i in range(len(step)):
 # phi = Fun.solveEulerex(step,dat.v_const,ax,bx,cx,dx,ay,by,cy,dy,t)
 step_new, phi = Fun.explizitEuler(ax, bx,cx,dx, ay, by,cy,dy,t,np.max(t),0.051,dat.y0,Fun.f)
 animation.plot_Phi2(phi,step)
-for i in range(len(step)):
+for i in range(len(phi)):
     sx[i] = spline(phi[i], ax, bx, cx, dx, N, t)
     sy[i] = spline(phi[i], ay, by, cy, dy, N, t)
 
