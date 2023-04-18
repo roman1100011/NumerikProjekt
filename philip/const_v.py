@@ -98,74 +98,72 @@ v0 = 2 #m/s     Geschwindigkeit
 
 
 
-
+tau0 = 0
 for i in range(len(t) -1):                  # Idee: für jeden Abschnitt der Spline soll der tau-Vektor seperat berechnet werden
-    s0 = np.array([x[i], y[i]])
-    tau0 = 0
+    def sx(tau):
+        return 0 + bx[i]*tau + 2*cx[i]*tau**2 + 3*dx[i]*tau**3
+
+    def sy(tau):
+        return 0 + by[i]*tau + 2*cy[i]*tau**2 + 3*dy[i]*tau**3
 
     def dsx(tau):
-        return bx + 2*cx*tau + 3*dx*tau**2
+        return float(bx[i]) + 2.0*float(cx[i])*tau + 3.0*float(dx[i])*tau**2
+
 
     def dsy(tau):
-        return by + 2*cy*tau + 3*dy*tau**2
+        return by[i] + 2*cy[i]*tau + 3*dy[i]*tau**2
 
-    def s(tau):        # Ortsfunktion, x und y Anteil
-        return 0
-
-    def ds():
-        return 0
-
-    def f(dsx, dsy):        # DGL rechte Seite
-        return v0 * 1/np.sqrt(dsx**2 + dsy**2)
+    def f(tau, dsx, dsy):        # DGL rechte Seite
+        return v0 * 1.0/np.sqrt(dsx**2 + dsy**2)
 
     # Länge des aktuellen Splineabschnitts berechnen
     start = count_elements_in_range(t_new, t[0], t[i])
     end =   count_elements_in_range(t_new, t[0], t[i+1])
     length_i = PathInt(x_new[start:end], y_new[start:end])
-    print(length_i)
 
 
     # explizites Eulerverfahren zum Lösen der DGL
-    def explizitEuler2(send, tau0, f, h=0.01 ):
-        s = [[0.], [0.]]
-        tau = [tau0]
-        salt = [0, 0]
-        taualt = tau0
-        while s[0][-1] < send[0] - h / 2 and s[1][-1] < send[1] - h / 2:
-            # explizites Eulerverfahren
-            tauneu = taualt + h*f(salt, taualt)
-            sneux = salt + h
-            sneuy = salt + h
-            # Speichern des Resultats
-            tau.append(tauneu)
-            s.append(sneu)
-            taualt = tauneu
-            salt = sneu
-        return np.array(s), np.array(tau)
+    def explizitEuler(f, tau0, dsx, dsy, t0, t_end, h=0.1):
+        """
+        Löst die Differentialgleichung tau'(t) = f(tau(t), dsx(tau), dsy(tau))
+        mithilfe des expliziten Euler-Verfahrens.
 
-    def explizitEuler(sendx, sendy, tau0, f, h=0.01 ):
-        sx = [0.]
-        sy = [0.]
-        tau = [tau0]
-        sxalt = 0
-        syalt = 0
-        taualt = tau0
-        while sx[-1] < sendx - h / 2 and sy[-1] < sendy - h / 2:
-            # explizites Eulerverfahren
-            tauneu = taualt + h*f(salt, taualt)
-            sxneu = sxalt + h
-            syneu = syalt + h           # das stimmt vermutlich so nicht
-            # Speichern des Resultats
-            tau.append(tauneu)
-            s.append(sneu)
-            taualt = tauneu
-            salt = sneu
-        return np.array(s), np.array(tau)
-    te, xe, ye = explizitEuler(x_new[i+1], y_new[i+1], tau0, f)
+        Args:
+        f: Eine Funktion, die die rechte Seite der Differentialgleichung f(tau, dsx, dsy) berechnet.
+        tau0: Der Anfangswert für tau.
+        dsx: Eine Funktion, die dsx(tau) berechnet.
+        dsy: Eine Funktion, die dsy(tau) berechnet.
+        t0: Der Anfangswert für t.
+        t_end: Der Endwert für t.
+        h: Der Zeitschritt.
 
-    #te, ye = explizitEuler(max(t_new), y[i], f) #gugus
+        Returns:
+        tau: Ein Array mit den Werten für tau an den Zeitpunkten t0, t0+h, t0+2h, ..., t_end.
+        """
+        num_steps = int((t_end - t0) / h)  # Anzahl der Zeitschritte
+        tau = [tau0]  # Anfangswert für tau
+        for i in range(num_steps):
+            t = t0 + i * h  # Aktueller Zeitpunkt
+            tau_i = tau[-1]  # Aktueller Wert für tau
+            dsx_i = dsx(tau_i)  # dsx an der Stelle tau_i
+            dsy_i = dsy(tau_i)  # dsy an der Stelle tau_i
+            tau_new = tau_i + h * f(tau_i, dsx_i, dsy_i)  # Berechne neuen Wert für tau
+            tau.append(tau_new)  # Füge neuen Wert für tau hinzu
+        return tau
+
+    tau_seq = explizitEuler(f, tau0, dsx, dsy, t[i], t[i+1])
+    print(max(tau_seq)-tau0)
+    tau0 = max(tau_seq)
+    if i == 0:
+        tau = tau_seq
+    else:
+        tau = np.concatenate((tau, tau_seq))
+
+#print(tau)
 
 
+
+# --------------------- Prüfen ob Geschwindigkeit konstant ist -------------------------------
 
 
 
@@ -201,7 +199,7 @@ def updateKonstant(i):
 
 # Erstellung der Animation
 animation = FuncAnimation(fig2, update, frames=len(t_new), interval=50, repeat=True)
-animationKonstant = FuncAnimation(fig2, updateKonstant, frames=len(t_new), interval=50, repeat=False)
+animationKonstant = FuncAnimation(fig2, updateKonstant, frames=len(t_new), interval=50, repeat=True)
 
 # Anzeigen der Animation
 plt.show()
