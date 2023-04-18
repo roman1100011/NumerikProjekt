@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 
 # --------------------- Funktion zur Berechnung kubischer Splines --------------------------------
-def cubic_spline(xraw, yraw):
+def cubic_spline(xraw, yraw, nrofpoints=500):
     n = len(xraw)
     h = np.diff(xraw)
     alpha = np.zeros(n - 1)
@@ -28,7 +28,7 @@ def cubic_spline(xraw, yraw):
     b = np.zeros(n - 1)
     d = np.zeros(n - 1)
 
-    xcs = np.linspace(xraw[0], xraw[n-1], 110)  # create points on x to calculate cubic spline y values
+    xcs = np.linspace(xraw[0], xraw[n-1], nrofpoints)  # create points on x to calculate cubic spline y values
     for j in range(n - 2, -1, -1):
         c[j] = z[j] - mu[j] * c[j + 1]
         b[j] = (yraw[j + 1] - yraw[j]) / h[j] - h[j] * (c[j + 1] + 2 * c[j]) / 3
