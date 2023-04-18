@@ -41,7 +41,7 @@ def cubic_spline(xraw, yraw):
                 ycs[i] = yraw[j] + b[j] * (xcs[i] - t[j]) + c[j] * (xcs[i] - t[j]) ** 2 + d[j] * (xcs[i] - t[j]) ** 3
                 break
 
-    return xcs, ycs
+    return xcs, ycs#, b, c, d
 
 
 
@@ -75,6 +75,40 @@ ax.legend()
 plt.xlabel('t')
 plt.ylabel('x und y')
 plt.show()
+
+
+
+# --------------------- Differentialgleichung zur Berechnung eines neuen Zeitvektors tau ---------------------
+
+v0 = 2 #m/s     Geschwindigkeit
+s0 = np.array([x_new[0], y_new[0]])
+ds
+
+def s():        # Ortsfunktion, x und y Anteil
+    return 0
+
+
+def f(v0, ds):        # DGL rechte Seite
+    return v0 * 1/np.sqrt(ds[0]**2 + ds[1]**2)
+
+# explizites Eulerverfahren zum Lösen der DGL
+def explizitEuler(xend, y0, f, h=0.01 ):
+    x = [0.]
+    y = [y0]
+    xalt = 0
+    yalt = y0
+    while x[-1] < xend-h/2:
+        # explizites Eulerverfahren
+        yneu = yalt + h*f(xalt, yalt)
+        xneu = xalt + h
+        # Speichern des Resultats
+        y.append(yneu)
+        x.append(xneu)
+        yalt = yneu
+        xalt = xneu
+    return np.array(x), np.array(y)
+te, se = explizitEuler(max(t_new), s0, f)
+
 
 
 
