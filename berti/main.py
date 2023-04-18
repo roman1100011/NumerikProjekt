@@ -3,15 +3,15 @@ import matplotlib.pyplot as pylab
 
 import Fun
 import animation
-from Fun import coeff, Spline
+from Fun import coeff, spline
 from data_handling import import_data
 from animation import Animate
 import Variables as dat
 
 
 
-#Daten Importieren
-x, y, t = import_data("/Users/romanberti/PycharmProjects/sandbox/coordinates.txt")
+#Daten Importieren  -> Achtung lokaler Path
+x, y, t = import_data("/Users/romanberti/PycharmProjects/scientificProject/coordinates.txt")
 
 #Calculate coeffitients
 ax, bx, cx, dx, N = coeff(t, x)
@@ -28,8 +28,8 @@ sy = np.zeros(len(step))
 
 #Spline ausrechnen aus koefizienten -> ploten
 for i in range(len(step)):
-    sx[i] = Spline(step[i], ax, bx, cx, dx, N,t)
-    sy[i] = Spline(step[i], ay, by, cy, dy, N,t)
+    sx[i] = spline(step[i], ax, bx, cx, dx, N, t)
+    sy[i] = spline(step[i], ay, by, cy, dy, N, t)
 
 
 phi = Fun.solveEulerex(step,dat.v_const,ax,bx,cx,dx,ay,by,cy,dy,t)
