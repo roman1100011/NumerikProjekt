@@ -4,12 +4,14 @@ import Variables as dat
 
 
 def spline(stepX, a, b, c, d, N, t):
-    if (stepX < t[0]) or (stepX > t[N]):
-        print("grenze überschritten")
-        return
+    #if (stepX < t[0]) or (stepX > t[N]):
+     #   print("grenze überschritten")
+        #return
     for i in range(N):
         if (stepX <= t[i + 1]):
             return a[i] + b[i] * (stepX - t[i]) + c[i] * pow(stepX - t[i], 2) + d[i] * pow(stepX - t[i], 3)
+def spline_num(stepX, a, b, c, d, N, t):
+    return a + b * (stepX - t) + c * pow(stepX - t, 2) + d * pow(stepX - t, 3)
 
 
 def coeff(x, y):
@@ -76,14 +78,39 @@ def s(b,c,d,step_s,t):
     x = b+2*c*(step_s-t)+d*3*(step_s-t)**3 # ableitung
     return x
 
+
+def s_num(a,b,c,d,step_s,t,h):
+    """
+    :param a:  aktueller a Koeff
+    :param b:  aktueller b Koeff
+    :param c:  aktueller c Koeff
+    :param d:  aktueller d Koeff
+    :param step_s: aktuelle zeit
+    :param t: grenze des abschnittes
+    :param h: schrittgrösse
+    :return:  ableitung
+    """
+    a, b, c, d, step_s, t = map(np.array, (a, b,c,d,step_s,t))  # copy the array
+    x1 = float (spline_num(step_s, a, b, c, d, 1, t))
+    x2 = float (spline_num(step_s-h , a, b, c, d, 1, t))
+    x = (x1-x2)/h
+    return x
+
 # Gesuchte funktion /aktuell nicht in verwendung
 def singelPhi(m, step_s):
     return m * step_s
 
 # Ableitung (Betrag eines 2D vektors) des weges an einem gegebenen Punkt -> geschwindigkeit
-def f(step_s, bx_s, cx_s, dx_s, by_s, cy_s, dy_s, t_s):
-    x = (s(bx_s, cx_s, dx_s, step_s, t_s)) ** 2
-    y = (s(by_s, cy_s, dy_s, step_s, t_s)) ** 2
+def f( bx_s, cx_s, dx_s, by_s, cy_s, dy_s, y_alt, t_s):
+    x = (s(bx_s, cx_s, dx_s, y_alt, t_s)) ** 2
+    y = (s(by_s, cy_s, dy_s, y_alt, t_s)) ** 2
+    g = dat.v_const / np.sqrt(x + y)
+    return g
+
+
+def f_num(ax, bx_s, cx_s, dx_s, ay, by_s, cy_s, dy_s, y_alt, t_s,h):
+    x = (s_num(ax, bx_s, cx_s, dx_s, y_alt, t_s, h)) ** 2
+    y = (s_num(ay, by_s, cy_s, dy_s, y_alt, t_s, h)) ** 2
     g = dat.v_const / np.sqrt(x + y)
     return g
 
@@ -91,17 +118,43 @@ def f(step_s, bx_s, cx_s, dx_s, by_s, cy_s, dy_s, t_s):
 # ODE nach euler expizit
 # Phi(t) hat 15 Abschnitte folglich ein gleichungssystem mit 15 gleichungen
 # Phi'(t) = vc/abs(Phi(t)
-def solveEulerex(step, vc, ax, bx, cx, dx, ay, by, cy, dy, t):
-    dh = 0.05 # Schrittgrösse aktuell
-    h = np.arange(t[0] + dh, t[-1] + dh, dh)
-    Phi_m = np.zeros(len(h))
-    Phi_m[0] = dat.y0 # Startwert für eulerverfahren
 
-    for i in range(1, len(h) - 1):
-        j = int((h[i] - np.mod(h[i], 2)) / 2) # itteration durch die Koeffizienten
-        Phi_m_prev = Phi_m[i - 1]
-        t_curr = h[i]
-        fcurent = f(Phi_m_prev, bx[j], cx[j], dx[j], by[j], cy[j], dy[j], t_curr)
-        Phi_m[i] = Phi_m_prev + dh * fcurent  # Vorwärtsschritt
 
-    return Phi_m
+
+# TODO: implementation ist nicht so falsch jedoch wird die ableitung an den stellen, bei denen die Parameter geändert werden hoch und daher fehlerhat, ein lösungsansatz ist, das euleverfahren stükweise zu machendamit innerhalb des eulerverfahrens keine "sprungstellen" entstehen
+def explizitEuler(ax, bx, cx, dx, ay, by, cy, dy,t, xend, h, y0, f):
+    """
+    :param bx:  bx koeffizient von Spline (Array)
+    :param cx:  cx koeffizient von Spline (Array)
+    :param dx:  dx koeffizient von Spline (Array)
+    :param by:  by koeffizient von Spline (Array)
+    :param cy:  cy koeffizient von Spline (Array)
+    :param dy:  dy koeffizient von Spline (Array)
+    :param t:   zeit-"stüzpunkte" gegeben durch anfängliche punkte
+    :param xend: grösster zeitwert
+    :param h:   Schrittgrösse für euler-verfahren
+    :param y0:  Anfangswert (Randwert)
+    :param f:   funktion
+    :return: t, Phi(t)
+    """
+    x = [0.]
+    y = [y0]
+    xalt = 0
+    yalt = y0
+
+    while x[-1] < xend-h/2:
+        j = int((yalt - np.mod(yalt-h , 2)) / 2) # itteration durch koeffizienten
+        # explizites Eulerverfahren
+        if j == 15:
+            j =14
+        yneu = yalt + h*f( bx[j], cx[j], dx[j], by[j], cy[j], dy[j],yalt, t[j]) # Symbolisch
+
+        xneu = xalt + h
+
+        # Speichern des Resultats
+        y.append(yneu)
+        x.append(xneu)
+
+        yalt = yneu
+        xalt = xneu
+    return np.array(x), np.array(y)
