@@ -3,8 +3,8 @@ from matplotlib.animation import FuncAnimation
 import matplotlib.pyplot as plt
 
 
-# Definiere eine Funktion zur Berechnung von kubischen Splines
-def cubic_spline(xraw, yraw):
+# --------------------- Funktion zur Berechnung kubischer Splines --------------------------------
+def cubic_spline(xraw, yraw, nrofpoints=500):
     n = len(xraw)
     h = np.diff(xraw)
     alpha = np.zeros(n - 1)
@@ -28,7 +28,7 @@ def cubic_spline(xraw, yraw):
     b = np.zeros(n - 1)
     d = np.zeros(n - 1)
 
-    xcs = np.linspace(xraw[0], xraw[-1], 110)  # create points on x to calculate cubic spline y values
+    xcs = np.linspace(xraw[0], xraw[n-1], nrofpoints)  # create points on x to calculate cubic spline y values
     for j in range(n - 2, -1, -1):
         c[j] = z[j] - mu[j] * c[j + 1]
         b[j] = (yraw[j + 1] - yraw[j]) / h[j] - h[j] * (c[j + 1] + 2 * c[j]) / 3
@@ -44,41 +44,52 @@ def cubic_spline(xraw, yraw):
     return xcs, ycs
 
 
-# Input der Rohdaten
-t = np.array([0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22])
-x = np.array([0, 400, 500, 500, 400, 50, 50, 200, 300, 460, 440, 150])
-y = np.array([0, 0, 100, 400, 500, 500, 575, 700, 700, 575, 400, 65])
 
-# Splineinterpolation mit der erstellten Funktion berechnen
+
+# --------------------- Import der Rohdaten --------------------------------------------------------------
+def import_data(Path):
+    imported_data = np.loadtxt(Path,skiprows=1)
+    t, x, y= imported_data[:,0],imported_data[:,1],imported_data[:,2]
+    return x, y, t
+x, y, t = import_data("/Users/philipkehl/Library/CloudStorage/OneDrive-ZHAW/Semester 4/Numerik/NumerikProjekt/coordinates.txt")
+
+
+
+
+
+# --------------------- Splineinterpolation berechnen und darstellen -------------------------------------
+# Spline rechnen
 t_new, x_new = cubic_spline(t, x)
 t_new, y_new = cubic_spline(t, y)
 
-"""
 # Rohdaten und Interpolation graphisch darstellen
-fig, ax = plt.subplots()
+fig1, ax = plt.subplots()
 ax.set_xlim([t[0] - 1, t[len(t) - 1] + 1])
-ax.set_ylim([min(min(x) - 1, min(y) - 1), max(max(x) + 1, max(y) + 1)])
+ax.set_ylim([min(min(x) - 100, min(y) - 100), max(max(x) + 100, max(y) + 100)])
 
 ax.plot(t, x, 'o', label='x-Rohdaten')
 ax.plot(t, y, 'o', label='x-Rohdaten')
 ax.plot(t_new, x_new, label='x-Spline-Interpolation')
 ax.plot(t_new, y_new, label='y-Spline-Interpolation')
 ax.legend()
+plt.xlabel('t')
+plt.ylabel('x und y')
 plt.show()
-"""
 
 
-# Zeitliche Animation der Rohdaten und der Interpolation
+
+# --------------------- Zeitliche Animation der Rohdaten und der Interpolation -------------------------------
 fig2, ax = plt.subplots()
 ax.set_xlim([min(x) - 50, max(x) + 50])
 ax.set_ylim([min(y) - 50, max(y) + 50])
 
 # Plotten der Punkte
 points, = ax.plot([], [], 'go', label='Spline')
-pointsSteady, = ax.plot([], [], 'yx', label='Spline')
+pointsKonstant, = ax.plot([], [], 'yx', label='Spline')
 ax.plot(x, y, 'ro', label='Rohdaten')
 ax.plot(x_new, y_new, 'b-', label='Spline')
-
+plt.xlabel('x')
+plt.ylabel('y')
 
 # Update-Funktion für die Animation
 def update(i):
@@ -88,18 +99,18 @@ def update(i):
     # Rückgabe des geänderten Punkte-Objekts
     return points,
 
-# Update-Funktion für die Animation mit stetiger geschwindigkeit
-def updateSteady(i):
+# Update-Funktion für die Animation mit KONSTANTER geschwindigkeit
+def updateKonstant(i):
     # Setzen der neuen Daten für die Punkte
-    pointsSteady.set_data(x_new[:i + 1], y_new[:i + 1])
+    pointsKonstant.set_data(x_new[:i + 1], y_new[:i + 1])
 
     # Rückgabe des geänderten Punkte-Objekts
-    return pointsSteady,
+    return pointsKonstant,
 
 
 # Erstellung der Animation
-animation = FuncAnimation(fig2, update, frames=len(t_new), interval=10, repeat=False)
-animationSteady = FuncAnimation(fig2, updateSteady, frames=len(t_new), interval=10, repeat=False)
+animation = FuncAnimation(fig2, update, frames=len(t_new), interval=50, repeat=True)
+animationKonstant = FuncAnimation(fig2, updateKonstant, frames=len(t_new), interval=50, repeat=False)
 
 # Anzeigen der Animation
 plt.show()

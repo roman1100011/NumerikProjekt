@@ -13,7 +13,7 @@ import Variables as dat
 
 
 #Daten Importieren  -> Achtung lokaler Path
-x, y, t = import_data("/Users/romanberti/PycharmProjects/scientificProject/coordinates.txt")
+x, y, t = import_data("/Users/philipkehl/Library/CloudStorage/OneDrive-ZHAW/Semester 4/Numerik/NumerikProjekt/coordinates.txt")
 
 #Calculate coeffitients
 bx: float | Any
