@@ -21,18 +21,26 @@ def Animate(x,y,sx,sy,step):
 
 
     # Erstellung der Animation
-    animation = FuncAnimation(fig2, update, frames=len(step), interval=25, repeat=True)
+    animation = FuncAnimation(fig2, update, frames=len(step), interval=25, repeat=False)
 
     # Anzeigen der Animation
     plt.show()
 def plot_Phi(phi,step):
     x = np.linspace(0,len(phi),600)/30
     fig1 , ax1 = plt.subplots()
-    ax1.set_xlim([min(x) - 5, max(x) + 5])
+    ax1.set_xlim([0 - 5, max(step) + 5])
     ax1.set_ylim([min(phi) - 10, max(phi) + 10])
-    ax1.plot(x, phi, 'ro', label='Phi')
-    ax1.plot(x,step)
+    ax1.plot(step, phi, 'ro', label='Phi')
     plt.grid = True
     plt.show()
 
 
+def plot_Phi2(phi,step):
+    x = np.linspace(0,len(phi),600)/30
+    fig1 , ax1 = plt.subplots()
+    ax1.set_xlim([min(x) - 5, max(x) + 5])
+    ax1.set_ylim([min(phi) - 10, max(phi) + 10])
+    ax1.plot(x, phi[:-4], 'ro', label='Phi')
+    ax1.plot(x,step[:-1])
+    plt.grid = True
+    plt.show()
