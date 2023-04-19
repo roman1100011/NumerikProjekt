@@ -4,12 +4,14 @@ import Variables as dat
 
 
 def spline(stepX, a, b, c, d, N, t):
-    if (stepX < t[0]) or (stepX > t[N]):
-        print("grenze überschritten")
-        return
+    #if (stepX < t[0]) or (stepX > t[N]):
+     #   print("grenze überschritten")
+        #return
     for i in range(N):
         if (stepX <= t[i + 1]):
             return a[i] + b[i] * (stepX - t[i]) + c[i] * pow(stepX - t[i], 2) + d[i] * pow(stepX - t[i], 3)
+def spline_num(stepX, a, b, c, d, N, t):
+    return a + b * (stepX - t) + c * pow(stepX - t, 2) + d * pow(stepX - t, 3)
 
 
 def coeff(x, y):
@@ -36,7 +38,7 @@ def coeff(x, y):
     # f''(x_{i + 1}) = (f(x_i) - 2f(x_{i+1}) + f(x_{i + 2})) / h_{i + 1} ^ 2
     for i in range(N - 1):
         f[i] = 6 * (y[i + 2] - y[i + 1]) / h[i + 1] - 6 * (y[i + 1] - y[i]) / h[i]
-    # Einschub test eigener Solver
+    # Einschub test eigener Solver aus der matrix die gesuchten koeffizienten herauslesen
 
     a[0] = 0
     c[N - 1] = 0
@@ -47,7 +49,7 @@ def coeff(x, y):
         b[i] = A[i, i]
     b[0] = A[0, 0]
 
-    ydd = TDMA_solver(a[:14], b[:14], c[1:15], f)
+    ydd = TDMA_solver(a[:14], b[:14], c[1:15], f) # Tridiagnonale Matrix lösen
     ydd2 = np.zeros(N + 1)
     ydd2[0] = 0  # Start Randbedingung
     ydd2[N] = 0  # end Randbedingung
@@ -70,21 +72,45 @@ def PathInt(sx, sy):
         l += np.sqrt(np.power(sx[n + 1] - sx[n], 2) + np.power(sy[n + 1] - sy[n], 2))
     return l
 
-
-def s(b, c, d, step_s, t):
-    b, c, d, step_s, t = map(np.array, (b, c, d, step_s, t))  # copy the array
-    x = b + c * (2 * step_s - 2 * t) + d * (
-                6 * t * step_s + 3 * t + 3 * step_s ** 2)  # Todo: geting very big values here ->
+# ableitung des weges in einer Dimension
+def s(b,c,d,step_s,t):
+    b,c,d,step_s,t = map(np.array, (b,c,d,step_s,t))  # copy the array
+    x = b+2*c*(step_s-t)+d*3*(step_s-t)**2 # ableitung
     return x
 
 
+def s_num(a,b,c,d,step_s,t,h):
+    """
+    :param a:  aktueller a Koeff
+    :param b:  aktueller b Koeff
+    :param c:  aktueller c Koeff
+    :param d:  aktueller d Koeff
+    :param step_s: aktuelle zeit
+    :param t: grenze des abschnittes
+    :param h: schrittgrösse
+    :return:  ableitung
+    """
+    a, b, c, d, step_s, t = map(np.array, (a, b,c,d,step_s,t))  # copy the array
+    x1 = float (spline_num(step_s, a, b, c, d, 1, t))
+    x2 = float (spline_num(step_s-h , a, b, c, d, 1, t))
+    x = (x1-x2)/h
+    return x
+
+# Gesuchte funktion /aktuell nicht in verwendung
 def singelPhi(m, step_s):
     return m * step_s
 
+# Ableitung (Betrag eines 2D vektors) des weges an einem gegebenen Punkt -> geschwindigkeit
+def f( bx_s, cx_s, dx_s, by_s, cy_s, dy_s, y_alt, t_s):
+    x = (s(bx_s, cx_s, dx_s, y_alt, t_s)) ** 2
+    y = (s(by_s, cy_s, dy_s, y_alt, t_s)) ** 2
+    g = dat.v_const / np.sqrt(x + y)
+    return g
 
-def f(step_s, bx_s, cx_s, dx_s, by_s, cy_s, dy_s, t_s, phi):
-    x = (s(bx_s, cx_s, dx_s, step_s, t_s)) ** 2
-    y = (s(by_s, cy_s, dy_s, step_s, t_s)) ** 2
+
+def f_num(ax, bx_s, cx_s, dx_s, ay, by_s, cy_s, dy_s, y_alt, t_s,h):
+    x = (s_num(ax, bx_s, cx_s, dx_s, y_alt, t_s, h)) ** 2
+    y = (s_num(ay, by_s, cy_s, dy_s, y_alt, t_s, h)) ** 2
     g = dat.v_const / np.sqrt(x + y)
     return g
 
@@ -92,17 +118,40 @@ def f(step_s, bx_s, cx_s, dx_s, by_s, cy_s, dy_s, t_s, phi):
 # ODE nach euler expizit
 # Phi(t) hat 15 Abschnitte folglich ein gleichungssystem mit 15 gleichungen
 # Phi'(t) = vc/abs(Phi(t)
-def solveEulerex(step, vc, ax, bx, cx, dx, ay, by, cy, dy, t):
-    dh = 0.05
-    h = np.arange(t[0] + dh, t[-1] + dh, dh)
-    Phi_m = np.zeros(len(h))
-    Phi_m[0] = dat.y0
 
-    for i in range(1, len(h) - 1):
-        j = int((h[i] - np.mod(h[i], 2)) / 2)
-        Phi_m_prev = Phi_m[i - 1]
-        t_curr = h[i]
-        fcurent = f(Phi_m_prev, bx[j], cx[j], dx[j], by[j], cy[j], dy[j], t_curr, 0)
-        Phi_m[i] = Phi_m_prev + dh * fcurent
 
-    return Phi_m
+def explizitEuler(ax, bx, cx, dx, ay, by, cy, dy,t, xend, h, y0, f):
+    """
+    :param bx:  bx koeffizient von Spline (Array)
+    :param cx:  cx koeffizient von Spline (Array)
+    :param dx:  dx koeffizient von Spline (Array)
+    :param by:  by koeffizient von Spline (Array)
+    :param cy:  cy koeffizient von Spline (Array)
+    :param dy:  dy koeffizient von Spline (Array)
+    :param t:   zeit-"stüzpunkte" gegeben durch anfängliche punkte
+    :param xend: grösster zeitwert
+    :param h:   Schrittgrösse für euler-verfahren
+    :param y0:  Anfangswert (Randwert)
+    :param f:   funktion
+    :return: t, Phi(t)
+    """
+    x = [0.]
+    y = [y0]
+    xalt = 0
+    yalt = y0
+
+    while y[-1] < xend:
+        j = int((yalt - np.mod(yalt-h/2 , 2)) / 2) # itteration durch koeffizienten
+        # explizites Eulerverfahren
+
+        yneu = yalt + h*f( bx[j], cx[j], dx[j], by[j], cy[j], dy[j],yalt, t[j]) # Symbolisch
+        #yneu = yalt + h * f_num(ax[j], bx[j], cx[j], dx[j], ay[j], by[j], cy[j], dy[j], yalt, t[j], h) #Nuerisch
+        xneu = xalt + h
+
+        # Speichern des Resultats
+        y.append(yneu)
+        x.append(xneu)
+
+        yalt = yneu
+        xalt = xneu
+    return np.array(x), np.array(y)
