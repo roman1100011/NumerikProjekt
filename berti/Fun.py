@@ -141,7 +141,7 @@ def explizitEuler(ax, bx, cx, dx, ay, by, cy, dy,t, xend, h, y0, f):
     yalt = y0
 
     while y[-1] < xend:
-        j = int((yalt - np.mod(yalt-h/2 , 2)) / 2) # itteration durch koeffizienten
+        j = int((yalt - np.mod(yalt , 2)) / 2) # itteration durch koeffizienten
         # explizites Eulerverfahren
 
         yneu = yalt + h*f( bx[j], cx[j], dx[j], by[j], cy[j], dy[j],yalt, t[j]) # Symbolisch
