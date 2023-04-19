@@ -29,18 +29,11 @@ sy = np.zeros(len(step))
 
 
 
-#Spline ausrechnen aus koeffizienten -> plotten
+#Spline ausrechnen aus koefizienten -> ploten
 for i in range(len(step)):
     sx[i] = spline(step[i], ax, bx, cx, dx, N, t)
     sy[i] = spline(step[i], ay, by, cy, dy, N, t)
 
-<<<<<<< HEAD
-phi = Fun.solveEulerex(step,dat.v_const,ax,bx,cx,dx,ay,by,cy,dy,t)
-# for i in range(len(phi)):
-#     sx[i] = spline(phi[i], ax, bx, cx, dx, N, t)
-#     sy[i] = spline(phi[i], ay, by, cy, dy, N, t)
-animation.plot_Phi(phi,step[:-1])
-=======
 # Constant speed
 # phi = Fun.solveEulerex(step,dat.v_const,ax,bx,cx,dx,ay,by,cy,dy,t)
 step_new, phi = Fun.explizitEuler(ax, bx,cx,dx, ay, by,cy,dy,t,np.max(t),0.05,dat.y0,Fun.f)
@@ -59,7 +52,6 @@ for i in range(len(phi)):
     sx[i] = spline(phi[i], ax, bx, cx, dx, N, t)
     sy[i] = spline(phi[i], ay, by, cy, dy, N, t)
 
->>>>>>> Stuckweise
 
 #Animiation der Punkte und Spline
 Animate(x,y,sx,sy,phi)
