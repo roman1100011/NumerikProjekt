@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-
 def Animate(x, y, sxv, syv,sxc,syc, step, phi):
     # Zeitliche Animation der Rohdaten und der Interpolation
     """
