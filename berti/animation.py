@@ -167,6 +167,14 @@ def Sd_num(time,sx,sy, i):
     :param i:    index für den zeitvektor, an dem die ableitung berechnet werden sollte
     :return:     Ableitung an Phi[i]
     """
+
+    #Catch division by zero
+    #da wir die vektorn step un phi gleich lange machen mussten hat es am schluss 2-3 identische einträge daher kann es zu einer division durch 0 führen. das wird hier abgefangen
+    if 0 == time[i]-time[i-1]:
+        return [0, 0]
+    if 0 == time[i+1]-time[i]:
+        return [0,0]
+
     if 0 < i < len(sx)-1:
     #Ableitnug in x richtung
         dxn = (sx[i]-sx[i-1]) / (time[i]-time[i-1])           #Ableitung ein schritt nach hinten
@@ -178,11 +186,11 @@ def Sd_num(time,sx,sy, i):
         dyp = (sy[i + 1] - sy[i]) / (time[i + 1] - time[i])  # Ableitung ein schritt nach forne
         dy = (dyn + dyp) / 2  # Mittel
         return  [dx/100,dy/100]
-    if i == 0:
+    if i == 0:         # Am ende wird der schritt nach hinten weggelassen
         dxp = (sx[i + 1] - sx[i]) / (time[i + 1] - time[i])  # Ableitung ein schritt nach forne
         dyp = (sy[i + 1] - sy[i]) / (time[i + 1] - time[i])  # Ableitung ein schritt nach forne
         return [dxp/100,dyp/100]
-    if i == len(sx)-1:
+    if i == len(sx)-1: # Am ende wird der schritt nach vorne weggelassen
         dyn = (sy[i] - sy[i - 1]) / (time[i] - time[i - 1])  # Ableitung ein schritt nach hinten
         dxn = (sx[i] - sx[i - 1]) / (time[i] - time[i - 1])  # Ableitung ein schritt nach hinten
         return [dxn/100,dyn/100]
