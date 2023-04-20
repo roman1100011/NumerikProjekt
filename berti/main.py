@@ -31,13 +31,9 @@ syv = np.zeros(len(step))
 
 #Spline ausrechnen aus koefizienten -> ploten
 for i in range(len(step)):
-<<<<<<< HEAD
     sxv[i] = spline(step[i], ax, bx, cx, dx, N, t)
     syv[i] = spline(step[i], ay, by, cy, dy, N, t)
-=======
-    sx[i] = spline(step[i], ax, bx, cx, dx, N, t)
-    sy[i] = spline(step[i], ay, by, cy, dy, N, t)
->>>>>>> main
+
 
 # Constant speed
 # phi = Fun.solveEulerex(step,dat.v_const,ax,bx,cx,dx,ay,by,cy,dy,t)
