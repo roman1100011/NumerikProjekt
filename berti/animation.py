@@ -1,8 +1,6 @@
 from matplotlib.animation import FuncAnimation
 import matplotlib.pyplot as plt
 import numpy as np
-
-
 def Animate(x, y, sxv, syv,sxc,syc, step, phi):
     # Zeitliche Animation der Rohdaten und der Interpolation
     """
@@ -39,19 +37,21 @@ def Animate(x, y, sxv, syv,sxc,syc, step, phi):
     ax.set_ylim([min(y) - 50, max(y) + 50])
     # Plotten der Punkte
 
-
-    points, = ax.plot([1,1],[0,0] , "o", label='point_1') # Startpunkte darstellen
+    # Initialize the points
+    point1, = ax.plot([1], [0], 'o', color='blue')
+    point2, = ax.plot([1], [0], 'o', color='green')
     ax.plot(x, y, 'ro', label='Rohdaten')         # Gegebene punkt darstellen
-    ax.plot(sxv, syv)                             # Berechnete spline darstellen
+    ax.plot(sxv, syv,zorder=1)                             # Berechnete spline darstellen
 
 
     # Update-Funktion für die Animation
     def update(i):
         # Setzen der neuen Daten für die Punkte
-        points.set_data([sxv[i + 1],sxc[i+1]], [syv[i + 1],syc[i+1]])
+        point1.set_data(sxv[i + 1], syv[i + 1])
+        point2.set_data( sxc[i + 1], syc[i + 1])
 
         # Rückgabe des geänderten Punkte-Objekts
-        return points,
+        return point1,point2
 
 
     # Erstellung der Animation
@@ -59,6 +59,8 @@ def Animate(x, y, sxv, syv,sxc,syc, step, phi):
 
     # Anzeigen der Animation
     plt.show()
+
+
 def plot_Phi(phi,step):
     x = np.linspace(0,len(phi),600)/30
     fig1 , ax1 = plt.subplots()
