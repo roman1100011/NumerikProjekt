@@ -76,6 +76,7 @@ def Animate(x, y, sxv, syv, sxc, syc, step, phi):
     veloc_2 = ax.quiver([1], [0], [0], [-1], color='blue', zorder=2)
 
     acel_1 = ax.quiver([1], [0], [0], [-1], color='green', zorder=2)  # beschleunigumgsvektor definieren
+    acel_2 = ax.quiver([1], [0], [0], [-1], color='orange', zorder=2)  # beschleunigumgsvektor definieren
 
     ax.plot(x, y, 'ro', label='Rohdaten')  # Gegebene punkt darstellen
     ax.plot(sxv, syv, zorder=1)  # Berechnete spline darstellen
@@ -94,6 +95,9 @@ def Animate(x, y, sxv, syv, sxc, syc, step, phi):
 
         acel_1.set_offsets([sxv[i + 1], syv[i + 1]])
         acel_1.set_UVC(av[i][0], av[i][1])  # dc[i] hat die form [u,v]
+
+        acel_2.set_offsets([sxc[i + 1], syc[i + 1]])
+        acel_2.set_UVC(ac[i][0], ac[i][1])  # dc[i] hat die form [u,v]
 
         # Rückgabe des geänderten Punkte-Objekts
         return point1, point2
