@@ -5,19 +5,34 @@ from tdmSolve import TDMA_solver
 
 
 def spline(stepX, a, b, c, d, N, t):
-    # if (stepX < t[0]) or (stepX > t[N]):
-    #   print("grenze überschritten")
-    # return
+    """
+    :param stepX: Zeitpunkt
+    :param a:     Parameter a der Spline
+    :param b:     Parameter b der Spline
+    :param c:     Parameter c der Spline
+    :param d:     Parameter d der Spline
+    :param N:     Anzahl parameter
+    :param t:     gegebene punkte in der zeit (wichtig um die parameter a-d zu wechseln)
+    :return:      wert der splein zur zeit StepX
+    """
     for i in range(N):
         if (stepX <= t[i + 1]):
             return a[i] + b[i] * (stepX - t[i]) + c[i] * pow(stepX - t[i], 2) + d[i] * pow(stepX - t[i], 3)
 
 
 def spline_num(stepX, a, b, c, d, N, t):
+    """ Diese funktio wird im nicht verwendet
+    spline_num ist eine abgeänderte version der funktion spline für
+     den fall, dass man numerisch differenzieren möchte"""
     return a + b * (stepX - t) + c * pow(stepX - t, 2) + d * pow(stepX - t, 3)
 
 
 def coeff(x, y):
+    """
+    :param x: x-koordinaten der gegebenen Punkte
+    :param y: y-koordinaten der gegebenen Punkte
+    :return:  Koeffizienten der spline a-d und Anzahl Koeffizienten als N
+    """
     N = len(y) - 1  # itterationslänge
     a = np.zeros(N)  # a coeff
     b = np.zeros(N)  # b coeff
@@ -37,11 +52,10 @@ def coeff(x, y):
             A[i + 1, i] = h[i + 1]
 
     f = np.zeros(N - 1)
-    # f''(x_i)       = (f(x_{i-1}) - 2f(x_i) + f(x_{i + 1})) / h_i ^ 2
-    # f''(x_{i + 1}) = (f(x_i) - 2f(x_{i+1}) + f(x_{i + 2})) / h_{i + 1} ^ 2
+
     for i in range(N - 1):
         f[i] = 6 * (y[i + 2] - y[i + 1]) / h[i + 1] - 6 * (y[i + 1] - y[i]) / h[i]
-    # Einschub test eigener Solver aus der matrix die gesuchten koeffizienten herauslesen
+
 
     a[0] = 0
     c[N - 1] = 0

@@ -12,35 +12,34 @@ from data_handling import import_data
 # Daten Importieren  -> Achtung lokaler Path
 x, y, t = import_data("/Users/romanberti/PycharmProjects/scientificProject/coordinates.txt")
 
-# Calculate coeffitients
+# Ausrechnen der koefizienten aus den gegebenen Punkten
 bx: float | Any
 ax, bx, cx, dx, N = coeff(t, x)
 ay, by, cy, dy, N = coeff(t, y)
 
 # -----------------------------------------------------------------------------------------------------------
-# Spline vorbereiten
+# Spline vorbereiten /arrays werden definiert
 dt = 0.05
 step = np.arange(t[0], t[N] + dt, dt)
-sxv = np.zeros(len(step))
-syv = np.zeros(len(step))
+sxv = np.zeros(len(step))                   # Array für weg-punkte mit variabler geschwindigkeit x koordinaten
+syv = np.zeros(len(step))                   # Array für wegpunkte mit variabler geschwindigkeit y koordinaten
 
-# Spline ausrechnen aus koefizienten -> ploten
+# Spline ausrechnen aus Koeffizienten -> ploten
 for i in range(len(step)):
-    sxv[i] = spline(step[i], ax, bx, cx, dx, N, t)
-    syv[i] = spline(step[i], ay, by, cy, dy, N, t)
+    sxv[i] = spline(step[i], ax, bx, cx, dx, N, t)      # Aus den Koeffizienten die datenpunkte für die Spline
+    syv[i] = spline(step[i], ay, by, cy, dy, N, t)      # mit variabler geschwindigkeit ausrechnen
 
-# Constant speed
-# phi = Fun.solveEulerex(step,dat.v_const,ax,bx,cx,dx,ay,by,cy,dy,t)
+# Diff gleichung mit euler expizit lösen
 step_new, phi = Fun.explizitEuler(ax, bx, cx, dx, ay, by, cy, dy, t, np.max(t), 0.05, dat.y0, Fun.f)
-animation.plot_Phi2(phi, step)
+animation.plot_Phi(phi, step)
 
-# Creat again with the correct length
-sxc = np.zeros(len(phi))
-syc = np.zeros(len(phi))
+# Spline Vorbereiten für konstant Geschwindigkeit
+sxc = np.zeros(len(phi))            # Array für weg-punkte mit konstanter geschwindigkeit x koordinaten
+syc = np.zeros(len(phi))            # Array für weg-punkte mit konstanter geschwindigkeit y koordinaten
 
 for i in range(len(phi)):
-    sxc[i] = spline(phi[i], ax, bx, cx, dx, N, t)
-    syc[i] = spline(phi[i], ay, by, cy, dy, N, t)
+    sxc[i] = spline(phi[i], ax, bx, cx, dx, N, t)       # Aus den Koeffizienten und phi die datenpunkte für die Spline
+    syc[i] = spline(phi[i], ay, by, cy, dy, N, t)       # mit konstanter geschwindigkeit ausrechnen
 
-# Animiation der Punkte und Spline
+# Animation der Punkte und Spline
 Animate(x, y, sxv, syv, sxc, syc, step, phi)
