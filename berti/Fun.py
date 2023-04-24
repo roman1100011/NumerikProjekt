@@ -40,7 +40,7 @@ def coeff(x, y):
     d = np.zeros(N)  # d coeff
 
     h = np.zeros(N)  # Schritte von euler
-
+#--------------------------------Aufstellen der gleichungen als tridiagonalmatrix-----------------
     for i in range(N):
         h[i] = x[i + 1] - x[i]
 
@@ -52,11 +52,13 @@ def coeff(x, y):
             A[i + 1, i] = h[i + 1]
 
     f = np.zeros(N - 1)
-
+#-----------------------------Aufstellen der Rechten seite des Gleichungssystems
     for i in range(N - 1):
         f[i] = 6 * (y[i + 2] - y[i + 1]) / h[i + 1] - 6 * (y[i + 1] - y[i]) / h[i]
 
-
+# Mein eigener TDMA solver nimmt keine Matrizen sondern 3 Vektoren für die linke seite des
+# Gleichungssystems und einen Vektor als rechte seite desshalb werden hier die entsprechenden
+# Vektoren extrahiert
     a[0] = 0
     c[N - 1] = 0
     for i in range(1, N - 1):
@@ -66,12 +68,17 @@ def coeff(x, y):
         b[i] = A[i, i]
     b[0] = A[0, 0]
 
+    del A # Freigeben des Speichers
+
     ydd = TDMA_solver(a[:14], b[:14], c[1:15], f)  # Tridiagnonale Matrix lösen
     ydd2 = np.zeros(N + 1)
+    # aus der lösung der Tridiagonalmatrix berechnen wir nun die Koeffizienten
+
+    # Lösung modifiziern um Randwerte einzubauen
     ydd2[0] = 0  # Start Randbedingung
     ydd2[N] = 0  # end Randbedingung
-    for i in range(N - 1):
-        ydd2[i + 1] = ydd[i]
+    ydd2[1:N]= ydd[:]
+    del ydd # Freigeben des speichers
 
     a = y
     c = ydd2 / 2
