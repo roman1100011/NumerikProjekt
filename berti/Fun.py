@@ -14,7 +14,7 @@ def spline(stepX, a, b, c, d, N, t):
     :param c:     Parameter c der Spline
     :param d:     Parameter d der Spline
     :param N:     Anzahl parameter
-    :param t:     gegebene punkte in der zeit (wichtig um die parameter a-d zu wechseln)
+    :param t:     gegebene punkte in der Zeit (wichtig um die parameter a-d zu wechseln)
     :return:      wert der splein zur zeit StepX
     """
     for i in range(N):
@@ -109,11 +109,12 @@ def s(b, c, d, step_s, t):
 
 def s_num(a, b, c, d, step_s, t, h):
     """
+    Numerische Ableitung wird nicht benötigt
     :param a:  aktueller a Koeff
     :param b:  aktueller b Koeff
     :param c:  aktueller c Koeff
     :param d:  aktueller d Koeff
-    :param step_s: aktuelle zeit
+    :param step_s: aktuelle Zeit
     :param t: grenze des abschnittes
     :param h: schrittgrösse
     :return:  ableitung
@@ -125,13 +126,19 @@ def s_num(a, b, c, d, step_s, t, h):
     return x
 
 
-# Gesuchte funktion /aktuell nicht in verwendung
-def singelPhi(m, step_s):
-    return m * step_s
-
-
 # Ableitung (Betrag eines 2D vektors) des weges an einem gegebenen Punkt -> geschwindigkeit
 def f(bx_s, cx_s, dx_s, by_s, cy_s, dy_s, y_alt, t_s):
+    """
+    :param bx_s:  b-Koeffizient am punkt y-alt x-Achse
+    :param cx_s:  c-Koeffizient am punkt y-alt x-Achse
+    :param dx_s:  d-Koeffizient am punkt y-alt x-Achse
+    :param by_s:  b-Koeffizient am punkt y-alt y-Achse
+    :param cy_s:  c-Koeffizient am punkt y-alt y-Achse
+    :param dy_s:  d-Koeffizient am punkt y-alt y-Achse
+    :param y_alt: Zeitpunkt der ableitung
+    :param t_s:   Zeitabschnitt
+    :return:      2-Norm der Ableitung
+    """
     x = (s(bx_s, cx_s, dx_s, y_alt, t_s)) ** 2
     y = (s(by_s, cy_s, dy_s, y_alt, t_s)) ** 2
     g = dat.v_const / np.sqrt(x + y)
