@@ -92,6 +92,11 @@ def coeff(x, y):
 
 # calculates the length of a 2D path from to arraya which represent the coordinataes
 def PathInt(sx, sy):
+    """
+    :param sx: x koordinaten des zu integrierenden weges
+    :param sy: y koordinaten des zu integrierenden Weges
+    :return: Länge des weges
+    """
     l = 0
     if len(sx) != len(sy):
         print("error in fun PathInt: Arrays must be the same length")
@@ -101,7 +106,16 @@ def PathInt(sx, sy):
 
 
 # ableitung des weges in einer Dimension
-def s(b, c, d, step_s, t):
+def s_ds(b, c, d, step_s, t):
+    """
+    Analytische bleitung zu dem zeitpunkt step_s
+    :param b: aktueller b Koeffizient
+    :param c: aktueller c Koeffizient
+    :param d: aktueller d Koeffizient
+    :param step_s: aktueller zeitpunkt
+    :param t: zeitliche grnze des aktullen abschnittes
+    :return: ableitung im R^1 also nach x ODER y
+    """
     b, c, d, step_s, t = map(np.array, (b, c, d, step_s, t))  # copy the array
     x = b + 2 * c * (step_s - t) + d * 3 * (step_s - t) ** 2  # ableitung
     return x
@@ -139,8 +153,8 @@ def f(bx_s, cx_s, dx_s, by_s, cy_s, dy_s, y_alt, t_s):
     :param t_s:   Zeitabschnitt
     :return:      2-Norm der Ableitung
     """
-    x = (s(bx_s, cx_s, dx_s, y_alt, t_s)) ** 2
-    y = (s(by_s, cy_s, dy_s, y_alt, t_s)) ** 2
+    x = (s_ds(bx_s, cx_s, dx_s, y_alt, t_s)) ** 2
+    y = (s_ds(by_s, cy_s, dy_s, y_alt, t_s)) ** 2
     g = dat.v_const / np.sqrt(x + y)
     return g
 
@@ -196,6 +210,19 @@ def explizitEuler(ax, bx, cx, dx, ay, by, cy, dy, t, xend, h, y0, f):
 
 ## Tri Diagonal Matrix Algorithm(a.k.a Thomas algorithm) solver
 def TDMA_solver(a, b, c, d):
+    """
+    b c 0 0 0 | d
+    a b c 0 0 | d
+    0 a b c 0 | d
+    0 0 a b c | d
+    0 0 0 a b | d
+
+    :param a: Untere diagonale
+    :param b: mittlere diagonale
+    :param c: obere diagonale
+    :param d: "Lösung"
+    :return: Lösung des systems
+    """
     nf = len(a)  # number of equations
     ac, bc, cc, dc = map(np.array, (a, b, c, d))  # copy the array
     for it in range(1, nf):
