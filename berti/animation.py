@@ -3,7 +3,6 @@ import numpy as np
 from matplotlib.animation import FuncAnimation
 
 
-
 def Animate(x, y, sxv, syv, sxc, syc, step, phi):
     # Zeitliche Animation der Rohdaten und der Interpolation
     """
@@ -14,12 +13,11 @@ def Animate(x, y, sxv, syv, sxc, syc, step, phi):
     :param syv: y-koordinate, der berechneten spline mit variabler geschwindigkeit
     :param sxc: x-koordinate, der berechneten spline mit gleicher geschwindigkeit
     :param syc: y-koordinate, der berechneten spline mit gleicher geschwindigkeit
-    :param step: zeitvektor der uhrsprünglichen spline (die daten werden nicht direkt gebraucht, nur die länge)
+    :param step: zeitvektor der ursprünglichen spline (die daten werden nicht direkt gebraucht, nur die länge)
     :param phi:  zeitvektor der korrigierter spline (die daten werden nicht direkt gebraucht, nur die länge)
     :return: keinen wert
     """
-    # durch die teils grösseren schrittgrösen ist jewils ein vektor etwas länger deshalb muss das korrigiert werden
-
+    # durch die teils grösseren Schrittgrössen ist jeweils ein vektor etwas länger deshalb muss das korrigiert werden
 
     len_array = [len(sxc),len(sxv)]  # array which contains the array length of the two splines (Assumption: the x and y vectors in the same spline are the same length)
     max_len_ind = len_array.index(max(len_array))
@@ -35,7 +33,7 @@ def Animate(x, y, sxv, syv, sxc, syc, step, phi):
             syc = np.append(syc, syc[i - 1])
             phi = np.append(phi, phi[i])
 
-    # Berechnen der ersten ableitung und sommit die geschwindigkeit, ausführung numerisch
+    # Berechnen der ersten ableitung und somit die geschwindigkeit, ausführung numerisch
     dv = [sd_num(step, sxv, syv, 0)]                                # geschwindigkeit variabel
     dc = [sd_num(step, sxc, syc, 0)]                                # geschwindigkeit konstan
 
@@ -46,7 +44,7 @@ def Animate(x, y, sxv, syv, sxc, syc, step, phi):
     dv.append(dv[-1])                                               # durch die differenatation verliere ich ein datenpunkt, daher wiederhole ich den letzen
     dc.append(dc[-1])
 
-    # convert to array for further procesing
+    # convert to array for further processing
     dv_a = np.array(dv)*100
     dc_a = np.array(dc) * 100
 
@@ -59,9 +57,9 @@ def Animate(x, y, sxv, syv, sxc, syc, step, phi):
     av.append(av[-1])                                               # durch die differenatation verliere ich ein datenpunkt, daher wiederhole ich den letzen
     ac.append(av[-1])                                               # durch die differenatation verliere ich ein datenpunkt, daher wiederhole ich den letzen
 
-    del dv_a, dc_a          #arrays löschen weil ich mit den listen weiter arbeite
+    del dv_a, dc_a          # arrays löschen, weil ich mit den listen weiter arbeite
 
-    # settup des Plotes
+    # setup des Plots
     fig2, ax = plt.subplots()
     ax.set_aspect('equal')
     ax.set_xlim([min(x) - 50, max(x) + 50])
@@ -72,32 +70,37 @@ def Animate(x, y, sxv, syv, sxc, syc, step, phi):
     point1, = ax.plot([1], [0], 'o', color='red')                       # 1 Punkt animation definieren
     point2, = ax.plot([1], [0], 'o', color='blue')                      # 2 Punkt animation definieren
 
-    veloc_1 = ax.quiver([1], [0], [0], [-1], color='red', zorder=2)     # Geschwindigkeitvektoren definieren
-    veloc_2 = ax.quiver([1], [0], [0], [-1], color='blue', zorder=2)
+    velocity_1 = ax.quiver([1], [0], [0], [-1], color='red', zorder=2)     # Geschwindigkeitsvektoren definieren
+    velocity_2 = ax.quiver([1], [0], [0], [-1], color='blue', zorder=2)
 
-    acel_1 = ax.quiver([1], [0], [0], [-1], color='green', zorder=2)    # beschleunigumgsvektor definieren
-    acel_2 = ax.quiver([1], [0], [0], [-1], color='orange', zorder=2)   # beschleunigumgsvektor definieren
+    accel_1 = ax.quiver([1], [0], [0], [-1], color='green', zorder=2)    # Beschleunigungsvektor definieren
+    accel_2 = ax.quiver([1], [0], [0], [-1], color='orange', zorder=2)   # Beschleunigungsvektor definieren
 
     ax.plot(x, y, 'ro', label='Rohdaten')  # Gegebene punkt darstellen
     ax.plot(sxv, syv, zorder=1)  # Berechnete spline darstellen
 
     # Update-Funktion für die Animation
     def update(i):
+        """
+        erneuert alle animierten objekte für einen gegebenen frame
+        :param i:  aktueller frame
+        :return: Punkte für die verscheidenden Splines
+        """
         # Punkte aktualisieren
         point1.set_data(sxv[i + 1], syv[i + 1])
         point2.set_data(sxc[i + 1], syc[i + 1])
 
         # Pfeile aktualisieren
-        veloc_1.set_offsets([sxv[i + 1], syv[i + 1]])
-        veloc_2.set_offsets([sxc[i + 1], syc[i + 1]])
-        veloc_1.set_UVC(dv[i][0], dv[i][1])  # dv[i] hat die form [u,v]
-        veloc_2.set_UVC(dc[i][0], dc[i][1])  # dc[i] hat die form [u,v]
+        velocity_1.set_offsets([sxv[i + 1], syv[i + 1]])
+        velocity_2.set_offsets([sxc[i + 1], syc[i + 1]])
+        velocity_1.set_UVC(dv[i][0], dv[i][1])  # dv[i] hat die form [u,v]
+        velocity_2.set_UVC(dc[i][0], dc[i][1])  # dc[i] hat die form [u,v]
 
-        acel_1.set_offsets([sxv[i + 1], syv[i + 1]])
-        acel_1.set_UVC(av[i][0], av[i][1])  # dc[i] hat die form [u,v]
+        accel_1.set_offsets([sxv[i + 1], syv[i + 1]])
+        accel_1.set_UVC(av[i][0], av[i][1])  # dc[i] hat die form [u,v]
 
-        acel_2.set_offsets([sxc[i + 1], syc[i + 1]])
-        acel_2.set_UVC(ac[i][0], ac[i][1])  # dc[i] hat die form [u,v]
+        accel_2.set_offsets([sxc[i + 1], syc[i + 1]])
+        accel_2.set_UVC(ac[i][0], ac[i][1])  # dc[i] hat die form [u,v]
 
         # Rückgabe des geänderten Punkte-Objekts
         return point1, point2
@@ -111,12 +114,12 @@ def Animate(x, y, sxv, syv, sxc, syc, step, phi):
     #animation_1.save("Projekt.gif")
 
 
-
-
-
-
-
 def plot_Phi(phi, step):
+    """
+    :param phi:  Neuer Zeitverlauf (euler verfahren)
+    :param step: ursprünglicher Zeitverlauf
+    :return:    Nichts
+    """
     x = np.linspace(0, len(phi), len(step)) / 30
     fig1, ax1 = plt.subplots()
     ax1.set_xlim([min(x) - 5, max(x) + 5])
@@ -144,21 +147,21 @@ def sd_num(time, sx, sy, i):
         return [0, 0]
 
     if 0 < i < len(sx) - 1:
-        # Ableitnug in x richtung
+        # Ableitung in x richtung
         dxn = (sx[i] - sx[i - 1]) / (time[i] - time[i - 1])  # Ableitung ein schritt nach hinten
-        dxp = (sx[i + 1] - sx[i]) / (time[i + 1] - time[i])  # Ableitung ein schritt nach forne
+        dxp = (sx[i + 1] - sx[i]) / (time[i + 1] - time[i])  # Ableitung ein schritt nach vorne
         dx = (dxn + dxp) / 2  # Mittel
 
-        # Ableitnug in y richtung
+        # Ableitung in y richtung
         dyn = (sy[i] - sy[i - 1]) / (time[i] - time[i - 1])  # Ableitung ein schritt nach hinten
-        dyp = (sy[i + 1] - sy[i]) / (time[i + 1] - time[i])  # Ableitung ein schritt nach forne
+        dyp = (sy[i + 1] - sy[i]) / (time[i + 1] - time[i])  # Ableitung ein schritt nach vorne
         dy = (dyn + dyp) / 2  # Mittel
         return [dx / 100, dy / 100]
-    if i == 0:  # Am ende wird der schritt nach hinten weggelassen
-        dxp = (sx[i + 1] - sx[i]) / (time[i + 1] - time[i])  # Ableitung ein schritt nach forne
-        dyp = (sy[i + 1] - sy[i]) / (time[i + 1] - time[i])  # Ableitung ein schritt nach forne
+    if i == 0:  # Am Anfang wird der Schritt nach hinten weggelassen
+        dxp = (sx[i + 1] - sx[i]) / (time[i + 1] - time[i])  # Ableitung ein schritt nach vorne
+        dyp = (sy[i + 1] - sy[i]) / (time[i + 1] - time[i])  # Ableitung ein schritt nach vorne
         return [dxp / 100, dyp / 100]
-    if i == len(sx) - 1:  # Am ende wird der schritt nach vorne weggelassen
+    if i == len(sx) - 1:  # Am Ende wird der Schritt nach vorne weggelassen
         dyn = (sy[i] - sy[i - 1]) / (time[i] - time[i - 1])  # Ableitung ein schritt nach hinten
         dxn = (sx[i] - sx[i - 1]) / (time[i] - time[i - 1])  # Ableitung ein schritt nach hinten
         return [dxn / 100, dyn / 100]

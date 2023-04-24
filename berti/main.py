@@ -1,5 +1,14 @@
-from typing import Any
+"""
+Main: Genereller Programmablauf; keine definition von Funktionen
 
+data_handling: Funktionen für den Import und formatieren von gegebenen daten
+
+animation: Funktionen zur darstellung und animation von daten
+
+Variables: Einige Daten wie die länge der Spline und geschwindigkeit müssen nicht immer von neuem ausgerechnet werden.
+            Desshalb sind solche variabeln in diesem file festgehalten
+"""
+from typing import Any
 import numpy as np
 
 import Fun
@@ -9,7 +18,7 @@ from Fun import coeff, spline
 from animation import Animate
 from data_handling import import_data
 
-# Daten Importieren  -> Achtung lokaler Path
+# Daten Importieren  -> Achtung lokaler Path!!!!!!
 x, y, t = import_data("/Users/romanberti/PycharmProjects/scientificProject/coordinates.txt")
 
 # Ausrechnen der koefizienten aus den gegebenen Punkten

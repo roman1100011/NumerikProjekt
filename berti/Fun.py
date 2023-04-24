@@ -1,7 +1,9 @@
+"""
+Die Funktionen in Fun werden gebraucht, um die Spline auszurechnen und
+die Differentialgleichung für die Konstante geschwindigkeit
+"""
 import numpy as np
-
 import Variables as dat
-from tdmSolve import TDMA_solver
 
 
 def spline(stepX, a, b, c, d, N, t):
@@ -40,7 +42,7 @@ def coeff(x, y):
     d = np.zeros(N)  # d coeff
 
     h = np.zeros(N)  # Schritte von euler
-#--------------------------------Aufstellen der gleichungen als tridiagonalmatrix-----------------
+# --------------------------------Aufstellen der gleichungen als tridiagonalmatrix-----------------
     for i in range(N):
         h[i] = x[i + 1] - x[i]
 
@@ -52,7 +54,7 @@ def coeff(x, y):
             A[i + 1, i] = h[i + 1]
 
     f = np.zeros(N - 1)
-#-----------------------------Aufstellen der Rechten seite des Gleichungssystems
+# -----------------------------Aufstellen der Rechten seite des Gleichungssystems
     for i in range(N - 1):
         f[i] = 6 * (y[i + 2] - y[i + 1]) / h[i + 1] - 6 * (y[i + 1] - y[i]) / h[i]
 
@@ -80,6 +82,7 @@ def coeff(x, y):
     ydd2[1:N]= ydd[:]
     del ydd # Freigeben des speichers
 
+# Koeffiziente ausrechnen
     a = y
     c = ydd2 / 2
     d = (ydd2[1:N + 1] - ydd2[:N]) / (6 * h[:N])
@@ -182,3 +185,23 @@ def explizitEuler(ax, bx, cx, dx, ay, by, cy, dy, t, xend, h, y0, f):
         yalt = yneu
         xalt = xneu
     return np.array(x), np.array(y)
+
+
+## Tri Diagonal Matrix Algorithm(a.k.a Thomas algorithm) solver
+def TDMA_solver(a, b, c, d):
+    nf = len(a)  # number of equations
+    ac, bc, cc, dc = map(np.array, (a, b, c, d))  # copy the array
+    for it in range(1, nf):
+        mc = ac[it] / bc[it - 1]
+        bc[it] = bc[it] - mc * cc[it - 1]
+        dc[it] = dc[it] - mc * dc[it - 1]
+
+    xc = ac
+    xc[-1] = dc[-1] / bc[-1]
+
+    for il in range(nf - 2, -1, -1):
+        xc[il] = (dc[il] - cc[il] * xc[il + 1]) / bc[il]
+
+    del bc, cc, dc  # delete variables from memory
+
+    return xc
