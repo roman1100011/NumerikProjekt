@@ -29,7 +29,7 @@ ay, by, cy, dy, N = coeff(t, y)
 
 # -----------------------------------------------------------------------------------------------------------
 # Spline vorbereiten /arrays werden definiert
-dt = 0.05
+dt = 0.05  # Wir haben ein kleineres delta t ausgewählt, weil so die Animation flüssiger wird
 step = np.arange(t[0], t[N] + dt, dt)
 sxv = np.zeros(len(step))  # Array für weg-punkte mit variabler geschwindigkeit x koordinaten
 syv = np.zeros(len(step))  # Array für wegpunkte mit variabler geschwindigkeit y koordinaten
@@ -38,7 +38,7 @@ syv = np.zeros(len(step))  # Array für wegpunkte mit variabler geschwindigkeit 
 for i in range(len(step)):
     sxv[i] = spline(step[i], ax, bx, cx, dx, N, t)  # Aus den Koeffizienten die datenpunkte für die Spline
     syv[i] = spline(step[i], ay, by, cy, dy, N, t)  # mit variabler geschwindigkeit ausrechnen
-
+# dat.v_const = Fun.PathInt(sxv,syv)/max(t) # Konstante geschwindigkeit ausrechen für den fall, dass man andere daten hat als in der aufgabenstellung
 # Diff gleichung mit euler expizit lösen
 step_new, phi = Fun.explizitEuler(ax, bx, cx, dx, ay, by, cy, dy, t, np.max(t), 0.05, dat.y0, Fun.f)
 animation.plot_Phi(phi, step)
